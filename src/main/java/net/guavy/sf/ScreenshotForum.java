@@ -27,7 +27,7 @@ public class ScreenshotForum {
     public static final String NAME = "Screenshot Forum";
     public static final String VERSION = "1.0";
 
-    public static final String IMGUR_TOKEN = "2166768cf4ec260";
+    public static final String IMGUR_TOKEN = "";
 
     private static Logger logger;
 
