@@ -1,9 +1,8 @@
 package net.guavy.sf.data;
 
 import io.netty.buffer.ByteBuf;
+import net.guavy.sf.ClientProxy;
 import net.guavy.sf.ScreenshotForum;
-import net.guavy.sf.gui.GuiSocialMenu;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -38,9 +37,7 @@ public class PacketSendPosts implements IMessage {
         }
 
         private void handle(PacketSendPosts message, MessageContext ctx) {
-            Minecraft mc = Minecraft.getMinecraft();
-
-            mc.addScheduledTask(() -> mc.displayGuiScreen(new GuiSocialMenu(message.posts)));
+            ClientProxy.openPostGui(message.posts);
         }
     }
 }

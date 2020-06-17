@@ -9,8 +9,10 @@ import net.guavy.sf.data.Post;
 import net.guavy.sf.event.PauseEventHandler;
 import net.guavy.sf.event.ScreenActionEventHandler;
 import net.guavy.sf.event.ScreenshotEventHandler;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -27,7 +29,7 @@ public class ScreenshotForum {
     public static final String NAME = "Screenshot Forum";
     public static final String VERSION = "1.0";
 
-    public static final String IMGUR_TOKEN = "";
+    public static final String IMGUR_TOKEN = "2166768cf4ec260";
 
     private static Logger logger;
 
@@ -36,25 +38,30 @@ public class ScreenshotForum {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        if(event.getSide().isClient()) {
+            MinecraftForge.EVENT_BUS.register(new PauseEventHandler());
+            MinecraftForge.EVENT_BUS.register(new ScreenshotEventHandler());
+            MinecraftForge.EVENT_BUS.register(new ScreenActionEventHandler());
+
+            ClientCommandHandler.instance.registerCommand(new NewPostCommand());
+        }
+
         logger = event.getModLog();
+        PacketHandler.registerMessages("sf");
     }
 
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
-        MinecraftForge.EVENT_BUS.register(new PauseEventHandler());
-        MinecraftForge.EVENT_BUS.register(new ScreenshotEventHandler());
-        MinecraftForge.EVENT_BUS.register(new ScreenActionEventHandler());
-
-        PacketHandler.registerMessages("sf");
-
-        ClientCommandHandler.instance.registerCommand(new NewPostCommand());
     }
 
     @Mod.EventHandler
     public void serverStart(FMLServerStartingEvent event) {
-        worldDirectory = new File("saves", event.getServer().getWorldName());
+        worldDirectory = new File(event.getServer().getFolderName());
+
+        if(!worldDirectory.exists())
+            worldDirectory = new File("saves", event.getServer().getWorldName());
 
         if(getPosts().isEmpty()) {
             ArrayList<Post> posts = new ArrayList<>();

@@ -9,7 +9,6 @@ import net.guavy.sf.data.Post;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -84,10 +83,13 @@ public class GuiNewPost extends GuiScreen {
 
                 client.close();
 
-                JsonObject object = new Gson().fromJson(result, JsonObject.class).get("data").getAsJsonObject();
-                Post post = new Post(this.postNameField.getText(), this.postDescriptionField.getText(), author, object.get("link").getAsString(), System.currentTimeMillis());
+                String link = new Gson().fromJson(result, JsonObject.class).get("data").getAsJsonObject().get("link").getAsString();
 
-                PacketHandler.INSTANCE.sendToServer(new PacketNewPost(post));
+                if(link != null) {
+                    Post post = new Post(this.postNameField.getText(), this.postDescriptionField.getText(), author, link, System.currentTimeMillis());
+
+                    PacketHandler.INSTANCE.sendToServer(new PacketNewPost(post));
+                }
 
                 this.mc.displayGuiScreen(null);
                 this.mc.setIngameFocus();
